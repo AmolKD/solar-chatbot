@@ -3,23 +3,37 @@ const API_KEY = "AIzaSyC7sRhoe5Aq8b-SQon-_mOpgVSxc7CYKQU"; // Replace with your 
 document.addEventListener("DOMContentLoaded", function () {
     console.log("Chatbot Loaded");
 
-    document.getElementById("sendButton").addEventListener("click", sendMessage);
-    document.getElementById("userInput").addEventListener("keypress", function (event) {
-        if (event.key === "Enter") {
-            sendMessage();
-        }
-    });
+    const sendButton = document.getElementById("sendButton");
+    const userInput = document.getElementById("userInput");
+
+    if (sendButton && userInput) {
+        sendButton.addEventListener("click", sendMessage);
+        userInput.addEventListener("keypress", function (event) {
+            if (event.key === "Enter") {
+                sendMessage();
+            }
+        });
+    } else {
+        console.error("Error: Chatbot elements not found. Check HTML structure.");
+    }
 });
 
 function sendMessage() {
-    const userMessage = document.getElementById("userInput").value.trim();
+    const userInput = document.getElementById("userInput");
+    const chatbox = document.getElementById("chatbox");
+
+    if (!userInput || !chatbox) {
+        console.error("Error: Missing input or chatbox elements.");
+        return;
+    }
+
+    const userMessage = userInput.value.trim();
     if (!userMessage) return;
 
-    const chatbox = document.getElementById("chatbox");
     chatbox.innerHTML += `<p><strong>You:</strong> ${userMessage}</p>`;
-    document.getElementById("userInput").value = "";
+    userInput.value = "";
 
-    // Modify user message to ensure responses include Agni Solar contact info
+    // Modify user message to include Agni Solar contact details
     const modifiedMessage = `${userMessage} 
 
 At the end of your response, include:
