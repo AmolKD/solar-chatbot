@@ -1,64 +1,55 @@
+const API_KEY = "AIzaSyC7sRhoe5Aq8b-SQon-_mOpgVSxc7CYKQU"; // Replace with your valid API key
+
 document.addEventListener("DOMContentLoaded", function () {
-    console.log("Chatbot Loaded");  // Debugging
+    console.log("Chatbot Loaded");
 
-    const chatForm = document.getElementById("chat-form");
-    const userInput = document.getElementById("user-input");
-    const chatBox = document.getElementById("chat-box");
-
-    if (!chatForm || !userInput || !chatBox) {
-        console.error("Chat form elements not found! Check HTML IDs.");
-        return;
-    }
-
-    // ✅ Make sure API key is inside double quotes
-    const API_KEY = "AIzaSyC7sRhoe5Aq8b-SQon-_mOpgVSxc7CYKQU";
-    const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`;
-
-    // ✅ Event listener for form submission
-    chatForm.addEventListener("submit", async function (event) {
-        event.preventDefault();
-        console.log("Send button clicked");
-
-        const userMessage = userInput.value.trim();
-        if (!userMessage) return;
-
-        appendMessage("You", userMessage);
-        userInput.value = "";
-
-        try {
-            // ✅ Corrected request payload format for Gemini API
-            const requestBody = {
-                contents: [{ role: "user", parts: [{ text: userMessage }] }]
-            };
-
-            const response = await fetch(GEMINI_API_URL, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(requestBody)
-            });
-
-            const data = await response.json();
-            console.log("API Response:", data);
-
-            if (data.error) {
-                console.error("Error from API:", data.error.message);
-                appendMessage("AI", "Error: " + data.error.message);
-                return;
-            }
-
-            // ✅ Extract AI response correctly
-            const aiResponse = data?.candidates?.[0]?.content?.parts?.[0]?.text || "No response from AI.";
-            appendMessage("AI", aiResponse);
-        } catch (error) {
-            console.error("Error:", error);
-            appendMessage("AI", "Error fetching response.");
+    document.getElementById("sendButton").addEventListener("click", sendMessage);
+    document.getElementById("userInput").addEventListener("keypress", function (event) {
+        if (event.key === "Enter") {
+            sendMessage();
         }
     });
-
-    function appendMessage(sender, message) {
-        const messageElement = document.createElement("p");
-        messageElement.innerHTML = `<strong>${sender}:</strong> ${message}`;
-        chatBox.appendChild(messageElement);
-        chatBox.scrollTop = chatBox.scrollHeight;
-    }
 });
+
+function sendMessage() {
+    const userMessage = document.getElementById("userInput").value.trim();
+    if (!userMessage) return;
+
+    const chatbox = document.getElementById("chatbox");
+    chatbox.innerHTML += `<p><strong>You:</strong> ${userMessage}</p>`;
+    document.getElementById("userInput").value = "";
+
+    // Modify user message to include Agni Solar contact details
+    const modifiedMessage = `${userMessage} 
+
+At the end of your response, always include:
+"For expert advice and a customized solar solution, contact Agni Solar at https://agnisolar.com or call +91-XXXXXXXXXX."`;
+
+    fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            contents: [{ parts: [{ text: modifiedMessage }] }]
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("API Response:", data);
+
+        if (data.error) {
+            console.error("Error from API:", data.error.message);
+            chatbox.innerHTML += `<p><strong>AI:</strong> Sorry, there was an error processing your request.</p>`;
+        } else {
+            const aiResponse = data.candidates[0]?.content?.parts[0]?.text || "No response";
+            chatbox.innerHTML += `<p><strong>AI:</strong> ${aiResponse}</p>`;
+        }
+
+        chatbox.scrollTop = chatbox.scrollHeight; // Auto-scroll to latest message
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        chatbox.innerHTML += `<p><strong>AI:</strong> Sorry, I encountered a problem. Please try again.</p>`;
+    });
+}
