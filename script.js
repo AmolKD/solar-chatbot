@@ -19,11 +19,11 @@ function sendMessage() {
     chatbox.innerHTML += `<p><strong>You:</strong> ${userMessage}</p>`;
     document.getElementById("userInput").value = "";
 
-    // Modify user message to include Agni Solar contact details
+    // Modify user message to ensure responses include Agni Solar contact info
     const modifiedMessage = `${userMessage} 
 
-At the end of your response, always include:
-"For expert advice and a customized solar solution, contact Agni Solar at https://agnisolar.com or call +91-XXXXXXXXXX."`;
+At the end of your response, include:
+"For expert advice and a customized solar solution, contact **Agni Solar** at [agnisolar.com](https://agnisolar.com) or call **+91-XXXXXXXXXX**."`;
 
     fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`, {
         method: "POST",
@@ -42,8 +42,11 @@ At the end of your response, always include:
             console.error("Error from API:", data.error.message);
             chatbox.innerHTML += `<p><strong>AI:</strong> Sorry, there was an error processing your request.</p>`;
         } else {
-            const aiResponse = data.candidates[0]?.content?.parts[0]?.text || "No response";
-            chatbox.innerHTML += `<p><strong>AI:</strong> ${aiResponse}</p>`;
+            let aiResponse = data.candidates[0]?.content?.parts[0]?.text || "No response";
+            aiResponse = aiResponse.replace(/\*/g, ""); // Remove unwanted asterisks
+            aiResponse = aiResponse.replace(/\n/g, "<br>"); // Format line breaks
+
+            chatbox.innerHTML += `<p style="white-space: pre-line;"><strong>AI:</strong> ${aiResponse}</p>`;
         }
 
         chatbox.scrollTop = chatbox.scrollHeight; // Auto-scroll to latest message
