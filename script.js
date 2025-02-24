@@ -1,13 +1,24 @@
 document.addEventListener("DOMContentLoaded", function () {
+    console.log("Chatbot Loaded");  // Debugging
+
     const chatForm = document.getElementById("chat-form");
     const userInput = document.getElementById("user-input");
     const chatBox = document.getElementById("chat-box");
 
-    const API_KEY = AIzaSyC7sRhoe5Aq8b-SQon-_mOpgVSxc7CYKQU;  // Replace with your NEW key
+    if (!chatForm || !userInput || !chatBox) {
+        console.error("Chat form elements not found! Check HTML IDs.");
+        return;
+    }
+
+    // ✅ Make sure API key is inside double quotes
+    const API_KEY = "AIzaSyCUlgkfZenPe_S51C1zO3Tlu9K477";
     const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`;
 
+    // ✅ Event listener for form submission
     chatForm.addEventListener("submit", async function (event) {
         event.preventDefault();
+        console.log("Send button clicked");
+
         const userMessage = userInput.value.trim();
         if (!userMessage) return;
 
@@ -26,9 +37,8 @@ document.addEventListener("DOMContentLoaded", function () {
             });
 
             const data = await response.json();
-            console.log("API Response:", data);  // Debugging
+            console.log("API Response:", data);
 
-            // Extract AI response properly
             const aiResponse = data?.candidates?.[0]?.content?.parts?.[0]?.text || "No response from AI.";
             appendMessage("AI", aiResponse);
         } catch (error) {
