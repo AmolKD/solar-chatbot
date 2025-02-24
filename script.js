@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // ✅ Make sure API key is inside double quotes
-    const API_KEY = "AIzaSyCUlgkfZenPe_S51C1zO3Tlu9K477";
+    const API_KEY = "AIzaSyC7sRhoe5Aq8b-SQon-_mOpgVSxc7CYKQU";
     const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`;
 
     // ✅ Event listener for form submission
