@@ -1,21 +1,22 @@
-const API_KEY = "AIzaSyC7sRhoe5Aq8b-SQon-_mOpgVSxc7CYKQU"; // Replace with your valid API key
-
 document.addEventListener("DOMContentLoaded", function () {
     console.log("Chatbot Loaded");
 
     const sendButton = document.getElementById("sendButton");
     const userInput = document.getElementById("userInput");
+    const chatbox = document.getElementById("chatbox");
 
-    if (sendButton && userInput) {
-        sendButton.addEventListener("click", sendMessage);
-        userInput.addEventListener("keypress", function (event) {
-            if (event.key === "Enter") {
-                sendMessage();
-            }
-        });
-    } else {
-        console.error("Error: Chatbot elements not found. Check HTML structure.");
+    // Check if elements exist before using them
+    if (!sendButton || !userInput || !chatbox) {
+        console.error("Error: Missing chatbot elements. Check your HTML file.");
+        return;
     }
+
+    sendButton.addEventListener("click", sendMessage);
+    userInput.addEventListener("keypress", function (event) {
+        if (event.key === "Enter") {
+            sendMessage();
+        }
+    });
 });
 
 function sendMessage() {
@@ -23,7 +24,7 @@ function sendMessage() {
     const chatbox = document.getElementById("chatbox");
 
     if (!userInput || !chatbox) {
-        console.error("Error: Missing input or chatbox elements.");
+        console.error("Error: Input or chatbox not found.");
         return;
     }
 
@@ -33,11 +34,13 @@ function sendMessage() {
     chatbox.innerHTML += `<p><strong>You:</strong> ${userMessage}</p>`;
     userInput.value = "";
 
-    // Modify user message to include Agni Solar contact details
+    // Append Agni Solar contact details
     const modifiedMessage = `${userMessage} 
 
 At the end of your response, include:
 "For expert advice and a customized solar solution, contact **Agni Solar** at [agnisolar.com](https://agnisolar.com) or call **+91-XXXXXXXXXX**."`;
+
+    const API_KEY = "AIzaSyC7sRhoe5Aq8b-SQon-_mOpgVSxc7CYKQU"; // Replace with a valid key
 
     fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`, {
         method: "POST",
@@ -56,8 +59,8 @@ At the end of your response, include:
             console.error("Error from API:", data.error.message);
             chatbox.innerHTML += `<p><strong>AI:</strong> Sorry, there was an error processing your request.</p>`;
         } else {
-            let aiResponse = data.candidates[0]?.content?.parts[0]?.text || "No response";
-            aiResponse = aiResponse.replace(/\*/g, ""); // Remove unwanted asterisks
+            let aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || "No response";
+            aiResponse = aiResponse.replace(/\*/g, ""); // Remove unnecessary asterisks
             aiResponse = aiResponse.replace(/\n/g, "<br>"); // Format line breaks
 
             chatbox.innerHTML += `<p style="white-space: pre-line;"><strong>AI:</strong> ${aiResponse}</p>`;
