@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solar AI Chatbot</title>
-    <link rel="stylesheet" href="style.css">
+    <title>AgniSolar AI Chatbot</title>
 </head>
 <body>
     <h1>Welcome to AgniSolar AI Chatbot</h1>
-    <div class="chat-container">
-        <div id="chatbox"></div>
-        <input type="text" id="userInput" placeholder="Ask me about solar energy..." />
-        <button onclick="sendMessage()">Send</button>
+    <div id="chat-box" style="width: 80%; height: 300px; border: 1px solid #000; padding: 10px; overflow-y: scroll;">
     </div>
+    <form id="chat-form">
+        <input type="text" id="user-input" placeholder="Type your message here..." required>
+        <button type="submit">Send</button>
+    </form>
+
     <script src="script.js"></script>
 </body>
 </html>
