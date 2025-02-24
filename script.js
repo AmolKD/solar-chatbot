@@ -26,8 +26,9 @@ document.addEventListener("DOMContentLoaded", function () {
         userInput.value = "";
 
         try {
+            // ✅ Corrected request payload format for Gemini API
             const requestBody = {
-                contents: [{ parts: [{ text: userMessage }] }]
+                contents: [{ role: "user", parts: [{ text: userMessage }] }]
             };
 
             const response = await fetch(GEMINI_API_URL, {
@@ -39,6 +40,13 @@ document.addEventListener("DOMContentLoaded", function () {
             const data = await response.json();
             console.log("API Response:", data);
 
+            if (data.error) {
+                console.error("Error from API:", data.error.message);
+                appendMessage("AI", "Error: " + data.error.message);
+                return;
+            }
+
+            // ✅ Extract AI response correctly
             const aiResponse = data?.candidates?.[0]?.content?.parts?.[0]?.text || "No response from AI.";
             appendMessage("AI", aiResponse);
         } catch (error) {
